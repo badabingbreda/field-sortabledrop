@@ -3,7 +3,7 @@
  * Plugin Name: Meta Box Sortable Drop Custom Field
  * Plugin URI: https://www.cftoolbox.io
  * Description: A Sortable and Droppable field that takes a list of custom values and allows you to select a portion and sort the order.
- * Version: 1.0
+ * Version: 1.1
  * Author: Badabing Breda
  * Author URI: https://www.badabing.nl
  * License: MIT
@@ -92,6 +92,7 @@ function badabing_sortabledrop_init() {
 	                // loop over the options and determine which ones are in or out the ones matching with the meta
 	                if ( count( $meta_order ) > 0 && $meta_order != '' ) {
 						for ($idx = 0; $idx < count($meta_order); $idx++) {
+                            if ( !isset( $field['options'][ $meta_order[ $idx ] ] ) ) continue;
 							$in[] 	= 		sprintf("<li data-id='%s'><div>%s%s</div></li>",
 													$meta_order[ $idx ],
 													$field[ 'sort_handle_html' ],
@@ -114,6 +115,7 @@ function badabing_sortabledrop_init() {
 	                // loop over the options and determine which ones are in or out the ones matching with the meta
 	                if ( count( $meta_order ) > 0 && $meta_order != '' ) {
 						for ($idx = 0; $idx < count($meta_order); $idx++) {
+                            if ( !isset( $field['options'][ $meta_order[ $idx ] ] ) ) continue;
 							$in[] 	= 		sprintf("<li data-id='%s'><div>%s%s</div></li>",
 													$meta_order[ $idx ],
 													$field[ 'sort_handle_html' ],
@@ -188,21 +190,26 @@ function badabing_sortabledrop_init() {
 
                     $script = <<<EOT
         <script type="text/javascript">
-            var el = document.getElementById('__%s');
-            var el_shared = document.getElementById('__%s_shared');
-            var sortable_%s = Sortable.create(el, {
-                handle: "%s",
-                ghostClass: 'bb-sortable-ghost-class' ,
-                group: 'shared_%s',
-                animation: 150,
-                store: {
-                    set: function( sortable ){
-                        document.getElementById( '%s' ).value = sortable.toArray().join( ',' );
-                        }
-                },
-				easing: "cubic-bezier(1, 0, 0, 1)"
-            });
-            var sortable_%s_shared = Sortable.create(el_shared, { handle: ".sort-handle", ghostClass: 'bb-sortable-ghost-class' , group: 'shared_%s', animation: 150 });
+            (function($) {
+                $(document).ready( function() {
+                    var el = document.getElementById('__%s');
+                    var el_shared = document.getElementById('__%s_shared');
+                    var sortable_%s = Sortable.create(el, {
+                        handle: "%s",
+                        ghostClass: 'bb-sortable-ghost-class' ,
+                        group: 'shared_%s',
+                        animation: 150,
+                        store: {
+                            set: function( sortable ){
+                                document.getElementById( '%s' ).value = sortable.toArray();
+                                }
+                        },
+                        easing: "cubic-bezier(1, 0, 0, 1)"
+                    });
+                    var sortable_%s_shared = Sortable.create(el_shared, { handle: ".sort-handle", ghostClass: 'bb-sortable-ghost-class' , group: 'shared_%s', animation: 150 });
+
+                });
+            })(jQuery);
         </script>
 EOT;
                     $return_string .= sprintf( $script , $field['id'], $field['id'], $field['id'], $field['sort_handle'], $field['id'], $field['id'], $field['id'] , $field['id'] );
@@ -211,18 +218,23 @@ EOT;
 
                     $script = <<<EOT
         <script type="text/javascript">
-            var el = document.getElementById('__%s');
-            var sortable_%s = Sortable.create(el, {
-            	handle: "%s",
-            	ghostClass: 'bb-sortable-ghost-class',
-            	animation: 150,
-            	store: {
-                    set: function( sortable ){
-                        document.getElementById( '%s' ).value = sortable.toArray().join( ',' );
-                    }
-                 },
-                 easing: "cubic-bezier(1, 0, 0, 1)"
-            });
+            (function($) {
+                $(document).ready( function() {
+                    var el = document.getElementById('__%s');
+                    var sortable_%s = Sortable.create(el, {
+                    	handle: "%s",
+                    	ghostClass: 'bb-sortable-ghost-class',
+                    	animation: 150,
+                    	store: {
+                            set: function( sortable ){
+                                document.getElementById( '%s' ).value = sortable.toArray();
+                            }
+                         },
+                         easing: "cubic-bezier(1, 0, 0, 1)"
+                    });
+                });
+            })(jQuery);
+
         </script>
 EOT;
                     $return_string .= sprintf( $script , $field['id'] , $field['id'] , $field['sort_handle'], $field['id'] );

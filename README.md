@@ -52,4 +52,6 @@ Field values are stored as a string, but when retrieved using rwmb_meta they wil
 
 ### changelog
 
+**v1.1** Added on jQuery document ready to enable use on frontend submissions
+
 **v1.0** Inital version
